@@ -8,17 +8,18 @@ export default defineConfig({
     title: "Silence's blog",
     base: '/',
     cacheDir: './node_modules/vitepress_cache',
-    description: 'vitepress,blog',
+    description: "Silence's blog",
     ignoreDeadLinks: true,
+    appearance:'dark',
     themeConfig: {
         posts: await getPosts(pageSize),
         website: 'https://github.com/Silence020922', //copyright link
         // 评论的仓库地址
-        comment: {
-            repo: 'Silence020922/Silence020922.github.io',
-            themes: 'github-light',
-            issueTerm: 'pathname'
-        },
+        //comment: {
+          //  repo: 'Silence020922/Silence020922.github.io',
+           // themes: 'github-light',
+            //issueTerm: 'pathname'
+        //},
         nav: [
             { text: 'Home', link: '/' },
             { text: 'Archives', link: '/pages/archives' },
@@ -31,7 +32,7 @@ export default defineConfig({
         },
         //outline:[2,3],
         outlineTitle: '文章摘要',
-        socialLinks: [{ icon: 'github', link: 'https://github.com/Silence020922/Silence020922.github.io' }]
+       // socialLinks: [{ icon: 'github', link: 'https://github.com/Silence020922/Silence020922.github.io' }]
     },
     srcExclude: ['README.md'], // exclude the README.md , needn't to compiler
 
