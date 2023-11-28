@@ -12,7 +12,7 @@ export default defineConfig({
     ignoreDeadLinks: true,
     themeConfig: {
         posts: await getPosts(pageSize),
-        website: 'https://github.com/airene/vitepress-blog-pure', //copyright link
+        website: 'https://github.com/Silence020922/Silence020922.github.io', //copyright link
         // 评论的仓库地址
         comment: {
             repo: 'Silence020922/Silence020922.github.io',
@@ -31,7 +31,7 @@ export default defineConfig({
         },
         //outline:[2,3],
         outlineTitle: '文章摘要',
-        socialLinks: [{ icon: 'github', link: 'https://github.com/airene/vitepress-blog-pure' }]
+        socialLinks: [{ icon: 'github', link: 'https://github.com/Silence020922/Silence020922.github.io' }]
     },
     srcExclude: ['README.md'], // exclude the README.md , needn't to compiler
 
