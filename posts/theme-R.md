@@ -1,7 +1,7 @@
 ---
 title: R实战入门
 date: 2022-10-17
-tag: 
+tags: 
 - R
 description: 专业课随笔，这里使用的参考书目是《R语言实战(第二版)》
 ---
