@@ -6,7 +6,7 @@ const pageSize = 10
 
 export default defineConfig({
     title: "Silence's blog",
-    base: '/',
+    base: 'Silence020922/Silence020922.github.io',
     cacheDir: './node_modules/vitepress_cache',
     description: 'vitepress,blog,blog-theme',
     ignoreDeadLinks: true,
