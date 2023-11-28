@@ -8,11 +8,11 @@ export default defineConfig({
     title: "Silence's blog",
     base: '/',
     cacheDir: './node_modules/vitepress_cache',
-    description: 'vitepress,blog,blog-theme',
+    description: 'vitepress,blog',
     ignoreDeadLinks: true,
     themeConfig: {
         posts: await getPosts(pageSize),
-        website: 'https://github.com/Silence020922/Silence020922.github.io', //copyright link
+        website: 'https://github.com/Silence020922', //copyright link
         // 评论的仓库地址
         comment: {
             repo: 'Silence020922/Silence020922.github.io',
