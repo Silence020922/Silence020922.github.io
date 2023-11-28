@@ -15,7 +15,7 @@ export default defineConfig({
         website: 'https://github.com/airene/vitepress-blog-pure', //copyright link
         // 评论的仓库地址
         comment: {
-            repo: 'airene/vitepress-blog-pure',
+            repo: 'Silence020922/Silence020922.github.io',
             themes: 'github-light',
             issueTerm: 'pathname'
         },
