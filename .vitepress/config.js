@@ -105,6 +105,7 @@ export default defineConfig({
     ignoreDeadLinks: true,
     appearance:'dark',
     markdown: {
+	    	theme: { light: 'nord', dark: 'nord' },
 		config: (md) => {
 			md.use(mathjax3);
 		},
