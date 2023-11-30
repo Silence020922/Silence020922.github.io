@@ -1,6 +1,6 @@
 ---
-date: 2023-06-30
-title: basic graph convolution operator
+date: 2023-11-29
+title: Basic graph convolution operator
 tags:
 - GNN
 - GSP
