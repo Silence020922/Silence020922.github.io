@@ -30,14 +30,15 @@ $$
 ### 从傅里叶变换到图傅里叶变换
 我们知道，傅里叶变换将信号从时域空间转换到频域空间，频域的视角对信号的处理带来了极大的便利。类比傅里叶变换，给出图信号傅里叶变换的定义，即将图信号由空域(spatial domain)转换到频域(frquency domain)。    
 在谱理论(spectral methods)中，记$L_{norm}$为正则化拉普拉斯矩阵，使用实对称矩阵的正交分解，$L_{norm} = U\Lambda U^T$。其中，$U = [u_1,u_2\dots u_n]$代表$L$的特征向量。图傅里叶变换(graph Fourier transform)被定义为$\mathscr{F}(x)=U^Tx$。由于$U$为正交矩阵，得到逆傅里叶变化$\mathscr{F}^{-1}(x) = Ux$。    
-```
+
 ::: tip
 下面给出一种图傅里叶变换的理解方式
 :::
-```
+
 - $\mathscr{F}^{-1}\mathscr{F}(x) = UU^Tx = x$，由于$U$为正交矩阵，变换——逆变换定义合理。
-- 令$\hat{x} = U^Tx = [\hat{x_1},\hat{x_2}\dots,\hat{x_n}] = [u_1^T,u_2^T\dots u_n^T]^T [x_1,x_2\dots x_n]$。将信号$x$原本的坐标系转换到特征向量组成的正交坐标系下，实现了从空域到频域的转换。
-![傅里叶变换与图傅里叶变换](https://surplus-1311636487.cos.ap-beijing.myqcloud.com/3AAItalk7.png)
+- 令$\hat{x} = U^Tx = [\hat{x_1},\hat{x_2}\dots,\hat{x_n}] = [u_1^T,u_2^T\dots u_n^T]^T [x_1,x_2\dots x_n]$。将信号$x$原本的坐标系转换到特征向量组成的正交坐标系下，实现了从空域到频域的转换。    
+  
+[傅里叶变换与图傅里叶变换图片示例](https://surplus-1311636487.cos.ap-beijing.myqcloud.com/3AAItalk7.png)
 ### 图卷积算子
 图卷积过程考虑$spatial \rightarrow frequency \rightarrow spatial domain$。    
 图信号卷积过程定义为$x \ast y=U((U^Tx)\odot(U^Ty))$，其中$\odot$为hadamard积。继续推导可以得出

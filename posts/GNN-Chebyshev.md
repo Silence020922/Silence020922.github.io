@@ -4,7 +4,7 @@ title: Convolution Neural Networks on Graphs with Fast Localized Spectral Filter
 tags:
 - GNN
 - Chebyshev
-description: 2-nd,参考*Convolution Neural Networks on Graphs with Fast Localized Spectral Filtering*
+description: 2-nd,参考Convolution Neural Networks on Graphs with Fast Localized Spectral Filtering
 ---
 # 卷积算符的切比雪夫多项式形式
 
@@ -67,19 +67,19 @@ $$
 g_\theta (\Lambda) = \sum_k \theta_k T_K(\widetilde{\Lambda})
 $$
 切比雪夫多项式要求特征值$\lambda \in [-1,1]$，这里$\widetilde{\Lambda} = \frac{2\Lambda}{\max_{\lambda in \Lambda}\lambda} - I_n$。
-```
+
 ::: tip
 原本归一化拉普拉斯矩阵对应的对角阵特征值符合切比雪夫多项式特征值要求范围，做如上改变的作用猜测一为保证数值的稳定性，二为尽可能的保留信息，避免信息损失。
 :::
-```
+
 
 #### 基于切比雪夫多项式的卷积运算
 本节主证明：$g_\theta \ast X =U(\sum_k \theta_k T_k (\widetilde{\Lambda}))U^T =  \sum_k \theta_k T_k(\widetilde{L}) X$，这里$\widetilde{L} = \frac{2L}{\lambda_{max} - I_n}$。同时，在该式基础上推导滤波运算的递推形式。    
-```
+
 ::: tip
 使用第二数学归纳法进行证明，以下为证明过程。
 :::
-```
+
 令
 $$
 \begin{cases}
@@ -106,11 +106,11 @@ g_{n+1} = g(n) + \theta_{n+1}T_{n+1}(U \widetilde{\Lambda}U^T)
 $$
 只要证明$U\theta_{n+1}T_{n+1}(\widetilde{\Lambda})U^T = \theta_{n+1}T_{n+1}(U \widetilde{\Lambda}U^T)$即可。    
 事实上，由于$(U \widetilde{\Lambda} U^T)^m = U \widetilde{\Lambda}^m U^T$，故两项中关于$\widetilde{\Lambda}^m$的系数相同，故$f(n+1) = g(n+1)$。证明完成!    
-```
+
 ::: tip
 下面给出递推形式，请注意，递推形式的计算中仅需要O(K|E|)的算法复杂度！！
 :::
-```
+
 由于$g_\theta \ast X= \sum_k \theta_k T_k(\widetilde{L}) X$，记$\tilde{X_k} = T_k (\widetilde{L}) X$，我们有
 $$
 \begin{cases}
