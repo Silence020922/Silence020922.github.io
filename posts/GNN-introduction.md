@@ -37,6 +37,7 @@ $$
 ```
 - $\mathscr{F}^{-1}\mathscr{F}(x) = UU^Tx = x$，由于$U$为正交矩阵，变换——逆变换定义合理。
 - 令$\hat{x} = U^Tx = [\hat{x_1},\hat{x_2}\dots,\hat{x_n}] = [u_1^T,u_2^T\dots u_n^T]^T [x_1,x_2\dots x_n]$。将信号$x$原本的坐标系转换到特征向量组成的正交坐标系下，实现了从空域到频域的转换。
+![傅里叶变换与图傅里叶变换](https://surplus-1311636487.cos.ap-beijing.myqcloud.com/3AAItalk7.png)
 ### 图卷积算子
 图卷积过程考虑$spatial \rightarrow frequency \rightarrow spatial domain$。    
 图信号卷积过程定义为$x \ast y=U((U^Tx)\odot(U^Ty))$，其中$\odot$为hadamard积。继续推导可以得出
