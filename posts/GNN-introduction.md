@@ -56,7 +56,8 @@ g \ast x &= U((U^Tg)\odot(U^Tx))\\
 &= Ug_{\theta}U^Tx
 \end{split}    
 $$
-这里，$g_{\theta}$为一个滤波运算，$g_{\theta}$可以被定义为参数自由的$g_{\theta} = diag(\Lambda)$。事实上$Ug_{\theta}U^T$为一个图位移算子。
+这里，$g_{\theta}$为一个滤波运算，$g_{\theta}$可以被定义为参数自由的$g_{\theta} = diag(\Lambda)$。事实上$Ug_{\theta}U^T$为一个图位移算子。    
+不同的图卷积意味设计不同的滤波器，但直接对滤波$g_\theta$变换是困难的，例如分解困难及存储困难。比较流行的解决方案是利用多项式近似滤波器。    
 
 #
 *接下来，将介绍几种在不同$g_{\theta}$设计下的典型谱方法。*

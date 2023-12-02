@@ -16,7 +16,7 @@ description: 2-nd,参考Convolution Neural Networks on Graphs with Fast Localize
 - $U$为稠密矩阵，加大了计算复杂度。
 
 ### 解决    
-基于切比雪夫多项式分解，选取$K$阶，这里$K << N$。
+基于切比雪夫多项式分解给出一种$K$阶的递推形式，这里$K << N$。
 $$
 g_{\theta} \ast X = \sum_{k=0}^K \theta_k T_k(\widetilde{L})X
 $$
