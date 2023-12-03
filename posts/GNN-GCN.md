@@ -4,7 +4,7 @@ title: GCN
 tags:
 - GNN
 - GCN
-description: 2-nd,参考SEMI-surperised classification with graph convolutional networks
+description: 4-nd,参考SEMI-surperised classification with graph convolutional networks
 ---
 # GCN
 ## 问题

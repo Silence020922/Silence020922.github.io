@@ -47,7 +47,7 @@ y = h(L)x = Uh(\Lambda)U^Tx = U diag[h(_{\lambda_1},\dots,h_{\lambda_n})]U^T x
 $$
 $h(\Lambda)$为一个滤波器，可以看到，上述过程$U^T x$将信号转换到频域，使用滤波器对通信频段进行过滤后使用图傅里叶逆变换重新转换到空域，完成滤波操作。特别的，如果取$h(\Lambda) = I_n$，此时，$y = x$为全通滤波器。
 ### 图卷积算子
-图卷积过程考虑$spatial \rightarrow frequency \rightarrow spatial domain$。    
+图卷积过程考虑$spatial \rightarrow frequency \rightarrow spatial /quad domain$。    
 图信号卷积过程定义为$x \ast y=U((U^Tx)\odot(U^Ty))$，其中$\odot$为hadamard积。继续推导可以得出
 $$
 \begin{split}
