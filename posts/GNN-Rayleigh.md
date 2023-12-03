@@ -39,6 +39,10 @@ R(A,x)= \frac{y^T\Lambda y}{y^T y} = \sum \lambda_i k_i^2
 $$
 这里注意到$|x| = \sum k_i^2 = 1$，于是，取$k_1=1和k_n=1$可以完成证明。
 # Laplacian
+证明$L = I-D^{\frac{-1}{2}}AD^{\frac{-1}{2}}$的特征值$\lambda \in [0,2]$。    
+::: tip
+下面给出证明
+:::    
 - 首先证明$A_{norm}$的特征值$-1 \leq \alpha_n \leq \dots \leq \alpha_1 \leq 1$。    
 记$A_{norm} = D^{\frac{-1}{2}}AD^{\frac{-1}{2}}$，$L = I + A_{norm}$。这里，$I+A_{norm},L$可证明半正定的。   
 $$
