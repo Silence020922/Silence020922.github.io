@@ -20,7 +20,7 @@ $\mathscr{G} = (V,E)$， $L = I-D^{-\frac{1}{2}}AD^{-\frac{1}{2}}$，$L = U\Lamb
 $$
 g_\theta(\Lambda) = \sum_{k=0}^{K-1} (F(L,X,\Gamma))^k
 $$
-其中，$X$为特征，$L$为归一化拉普拉斯矩阵，$\Gamma$为可学习参数。我们定义了新的SGG-LL层
+其中，$X$为特征，$L$为归一化拉普拉斯矩阵，$\Gamma$为可学习参数。我们定义了新的SGC-LL层
 $$
 y = Ug_\theta(\Lambda)U^TX = U\sum_{k=0}^{K-1} (F(L,X,\Gamma))^kU^T X
 $$
