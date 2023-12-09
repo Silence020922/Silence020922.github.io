@@ -1,6 +1,6 @@
 ---
 date: 2023-11-30
-title: Convolution Neural Networks on Graphs with Fast Localized Spectral Filtering
+title: ChebNet
 tags:
 - GNN
 - Chebyshev
