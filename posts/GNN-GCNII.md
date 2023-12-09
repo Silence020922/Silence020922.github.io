@@ -68,11 +68,11 @@ $$
   H = \alpha(I_n - (1-\alpha)P)^{-1} f_\theta(X)
   $$
 - 对求逆过程的优化    
-  由于矩阵逆运算计算复杂度高，使用近似表示
+  由于矩阵逆运算计算复杂度高，由于整个 *Personalized PgeRank*就是一个带重启的随机游走，于是得到近似
   $$
   H^{l+1} = (1-\alpha)\widetilde{P}H^{l} + \alpha H^{0}, where \quad H^{0} = f_\theta (X)
   $$
-  仅最后一层使用非线性激活函数。
+事实上，PPNP只在初始阶段使用了非线性变换——一个两层的全连接神经网络，可以说，PPNP丢弃了非线性激活层的作用。
 ## GCNII Model
 首先总的介绍该模型，然后从两个关键组件*Initial residual connection* 和 *Identity mapping*分别进行介绍。
 ### Model
@@ -99,7 +99,7 @@ Identity mapping 的引入有多方面考虑。在GCN中，对特征添加了线
 ### 证明了加入剩余连接的GNN作为lazy walk会收敛到与初始特征无关的值，并给出收敛速度
 令$h^k =(\frac{I_n + \widetilde{D}^{-\frac{1}{2}}\widetilde{A}\widetilde{D}^{-\frac{1}{2}}} {2})^K x$代表了经过有残差连接的$K$层图卷积的表示。用$\lambda_{\widetilde{G}}$表示自连接图$\widetilde{G}$的 *spectral gap*， 即归一化拉普拉斯矩阵$\widetilde{L} = \widetilde{D}^{-\frac{1}{2}}\widetilde{A}\widetilde{D}^{-\frac{1}{2}}$的最小非零特征值。可以证明以下结论
 - 随着$K$趋于无穷，$h^K$收敛到$\pi = \frac{<\widetilde{D}^{\frac{1}{2}}1,x>}{2m+n} \cdot \widetilde{D}^{\frac{1}{2}}1$, $1$为全一向量。
-- $h^K  \pi \pm (\sum_{i=1}^n x_i)\cdot(1-\frac{\lambda_{\widetilde{G}}^2}{2})^K$，这里符号$\pm$表示$|h^k - \pi| \leq (\sum_{i=1}^n x_i)\cdot(1-\frac{\lambda_{\widetilde{G}}}{2})^K$。
+- $h^K = \pi \pm (\sum_{i=1}^n x_i)\cdot(1-\frac{\lambda_{\widetilde{G}}^2}{2})^K$，这里符号$\pm$表示$|h^k - \pi| \leq (\sum_{i=1}^n x_i)\cdot(1-\frac{\lambda_{\widetilde{G}}}{2})^K$。
 ### 根据上一个证明可以推断高度点的收敛速度更快
 事实上，$h^K  \pi \pm (\sum_{i=1}^n x_i)\cdot(1-\frac{\lambda_{\widetilde{G}}}{2}^2)^K$可以改写为
 $$
