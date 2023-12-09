@@ -1,6 +1,6 @@
 ---
-date: 2023-12-04
-title: GCN
+date: 2023-12-09
+title: GCNII
 tags:
 - GNN
 - GCNII
