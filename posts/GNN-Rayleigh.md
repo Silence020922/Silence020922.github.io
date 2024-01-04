@@ -4,7 +4,7 @@ title: Eigenvalues of the Laplacian
 tags:
 - Rayleigh quotient
 - Laplacian matrix
-description: 3-nd,给出拉普拉斯矩阵特征值范围[0,2]的证明。
+description: 3-rd,给出拉普拉斯矩阵特征值范围[0,2]的证明。
 ---
 本文的拉普拉斯$L = L_{norm} = I-D^{\frac{-1}{2}}AD^{\frac{-1}{2}}$。
 # Rayleigh quotient

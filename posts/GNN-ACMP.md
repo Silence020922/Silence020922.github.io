@@ -4,7 +4,7 @@ title: ACMP
 tags:
 - GNN
 - ACMP
-description: 7-nd，本文从神经信息传递的角度推到出模型并从能量函数的角度给出理论证明。参考Acmp:Allen-cahn message passing with attractive and repulsive forces for graph neural networks
+description: 7-th，本文从神经信息传递的角度推到出模型并从能量函数的角度给出理论证明。参考Acmp:Allen-cahn message passing with attractive and repulsive forces for graph neural networks
 ---
 # ACMP
 ## Introduction 

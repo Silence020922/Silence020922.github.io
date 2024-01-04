@@ -4,7 +4,7 @@ title: AGCN
 tags:
 - GNN
 - AGCN
-description: 5-nd,考虑到在GCN模型中，由于表达与邻接矩阵直接相关，邻居节点的重要性由中心节点一圈一圈向外散布，这限制了卷积核的flexibility。这里考虑通过学习广义马氏距离替代邻接矩阵，实现对拉普拉斯矩阵的参数化设计，增加模型的表达能力。参考Adaptive Graph Convolutional Neural Networks。
+description: 5-th,考虑到在GCN模型中，由于表达与邻接矩阵直接相关，邻居节点的重要性由中心节点一圈一圈向外散布，这限制了卷积核的flexibility。这里考虑通过学习广义马氏距离替代邻接矩阵，实现对拉普拉斯矩阵的参数化设计，增加模型的表达能力。参考Adaptive Graph Convolutional Neural Networks。
 ---
 # AGCN
 接下来的几篇文章将会就对GCN从不同方面考虑进行优化进行介绍。首先介绍AGCN即Adaptive Graph Convolutional Neural Networks，该方法通过改变拉普拉斯矩阵优化GCN性能。
