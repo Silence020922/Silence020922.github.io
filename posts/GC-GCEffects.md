@@ -1,11 +1,10 @@
 ---
-date: 2023-1-4
+date: 2023-01-04
 title: ACMP
 tags:
 - GC
 - Theory
-description: 8-th，自GNN面世后，衍生了很多的变式，也存在很多实际的应用。但对向神经网络中添加卷积算子的意义本身，却缺乏理论上的证明，本文将
-携带卷积算子的神经网络与不使用图信息的神经网络进行对比，从理论出发给出严密的证明。参考Effects of graph convolutions in multi-layer networks
+description: 8-th，自GNN面世后，衍生了很多的变式，也存在很多实际的应用。但对向神经网络中添加卷积算子的意义本身，却缺乏理论上的证明，本文将携带卷积算子的神经网络与不使用图信息的神经网络进行对比，从理论出发给出严密的证明。参考Effects of graph convolutions in multi-layer networks
 ---
 # Introduction
 论文来自2023 ICLR会议论文。看了三个月GNN相关内容，所看到的GCN的支撑不是从实例性能出发，就是从思想来源，由CNN、图信号等领域自然发展而来，
