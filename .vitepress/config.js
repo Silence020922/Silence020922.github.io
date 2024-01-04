@@ -103,7 +103,7 @@ export default defineConfig({
     cacheDir: './node_modules/vitepress_cache',
     description: "Silence's blog",
     ignoreDeadLinks: true,
-    appearance:'dark',
+    appearance: 'dark',
     markdown: {
 	    	theme: { light: 'nord', dark: 'nord' },
 		config: (md) => {
