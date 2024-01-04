@@ -1,6 +1,6 @@
 ---
-date: 2023-01-04
-title: ACMP
+date: 2024-01-04
+title: Effects of GC
 tags:
 - GC
 - Theory
