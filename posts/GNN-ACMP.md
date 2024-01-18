@@ -62,9 +62,22 @@ $$
 ### Particle equation with the double-well potential
 相应的，本文提出的模型也对应了一个优化过程。势能项$W$的主要作用是防止粒子系统空间的无限膨胀。因为系统中存在排斥力，相互排斥的粒子如果始终保持排斥状态，随着时间推进，粒子直接会不断远离。从网络层面上说，特征向量的值会随着网络的加深不断增大，最后超出需要的范围。因此，引入一个井状的势能场，也就是说，在系统边缘的区域施加一个强位势，在系统中心施加弱位势，对维持系统的稳定方面可以起到积极的作用。本文采用了双势能井。一方面，两侧的高位势保持了系统的稳定性，另一方面，中间的“W”形低位势在容许交互作用力为主导作用的状态下，对异种粒子的分离起到促进作用。
 ## Network Architecture
+$$
+\frac\partial{\partial t}\mathbf{x}_i(t)=\boldsymbol{\alpha}\odot\sum_{j\in\mathcal{N}_i}(a(\mathbf{x}_i(t),\mathbf{x}_j(t))-\beta)(\mathbf{x}_j(t)-\mathbf{x}_i(t))+\boldsymbol{\delta}\odot\mathbf{x}_i(t)\odot(1-\mathbf{x}_i(t)\odot\mathbf{x}_i(t)).
+$$
 这里， $x_i$表示第$i$个结点的特征向量； $a(x_i,x_j)$表示结点之间的边特征，根据需要，可以选择诸如$a^{GCN}$系数，$a^{GAT}$系数或任何表示结点间相似度的系数。$\alpha,\delta$是可学习参数， $\beta$表示超参数，哈达玛积（Hadamard product）表示所有运算是在$channel-wise$意义下执行的.右边的第一项对应相互作用力，第二项对应势能项，$\alpha$和$\delta$ 用来平衡和调节这两项的作用强度。
 ### ACMP-GCN
+$$
+\frac\partial{\partial t}\mathbf{x}_i(t)=\boldsymbol{\alpha}\odot\sum_{j\in\mathcal{N}_i}(a_{i,j}^\mathrm{GCN}-\beta)(\mathbf{x}_j(t)-\mathbf{x}_i(t))+\boldsymbol{\delta}\odot\mathbf{x}_i(t)\odot(1-\mathbf{x}_i(t)\odot\mathbf{x}_i(t)).
+$$
+$$
+a_{i,j}^{\text{GCN}} : = a _ { i , j }/\sqrt{\hat{d}_i\hat{d}_j}.
+$$
 ### ACMP-GAT
+$$
+\alpha_{i,j}=\frac{\exp\left(\operatorname{LeakyReLU}\left(\mathbf{a}^\top[\mathbf{\Theta}\mathbf{x}_i\parallel\mathbf{\Theta}\mathbf{x}_j]\right)\right)}{\sum_{k\in\mathcal{N}_i\cup\{i\}}\exp\left(\operatorname{LeakyReLU}\left(\mathbf{a}^\top[\mathbf{\Theta}\mathbf{x}_i\parallel\mathbf{\Theta}\mathbf{x}_k]\right)\right)}.
+$$
+使用$\alpha_{i,j}$代替上式中$a_{i,j}^{GCN}$即可。
 ### Neural ODE Solver
 使用explicit Euler, Runge-Kutta 4th-order, midpoint, Dormand-Prince5 等都可以很好的给出ACMP模型的一个数值解。
 ### Theory
