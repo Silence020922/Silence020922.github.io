@@ -112,3 +112,53 @@ $$
 这个式子告诉我们，具有较大度的节点会收敛的更快。事实上，也在实验中证实了这个猜想。
 ### GCNII模型能够有效防止过平滑问题出现
 回想一下，第一个定理告诉我们GCN模拟了一个$K$阶的多项式滤波器$\widetilde{P}^K x$，其收敛状态值与初始特征$x$无关，导致了过平滑。这里证明了GCNII由于Identity mapping 的存在，可以逼近任意系数的$K$阶多项式滤波器$h^k = (\sum_{l = 0}^K \theta_l \widetilde{L}^l) \cdot x$，于是通过选择合适的$\theta$，可以使结果聚合初始特征和结构信息。
+## 结果
+### Semi
+使用GCNII_, GCNII*_ 表示复现的GCNII及其变式。执行下述操作检验GCNII在对应数据集半监督学习的结果。
+```zsh
+python -u train.py --data cora --layer 64 --r 100 --test 
+python -u train.py --data cora --layer 64 --r 100 --variant --test
+python -u train.py --data citeseer --layer 32 --hidden 256 --lamda 0.6 --dropout 0.7 --r 100 --test
+python -u train.py --data citeseer --layer 32 --hidden 256 --lamda 0.6 --dropout 0.7 --r 100 --variant --test
+python -u train.py --data pubmed --layer 16 --hidden 256 --lamda 0.4 --dropout 0.5 --wd1 5e-4 --r 100 --test
+python -u train.py --data pubmed --layer 16 --hidden 256 --lamda 0.4 --dropout 0.5 --wd1 5e-4 --r 100 --variant --test
+```
+Semi|cora|citeseer|pubmed
+---|---|---|---
+GCNII(paper)|85.5 $\pm$ 0.5(64)|73.4 $\pm$ 0.6(32)|80.2 $\pm$ 0.4(16)
+GCNII*(paper)|85.3 $\pm$ 0.2(64)|73.2 $\pm$ 0.8(32)| 80.3 $\pm$ 0.4(16)
+GCNII|85.1(6.08)|72.8(5.28)|79.7(23.80)
+GCNII*|85.5(6.53)|72.7(6.80)|80.0(27.98)
+GCNII_|85.4(5.60)|72.9(5.21)|79.7(23.51)
+GCNII*_|85.4(5.88)|72.9(6.80)|79.9(27.24)
+
+```zsh
+python -u full-supervised.py --data cora --layer 64 --alpha 0.2 --weight_decay 1e-4
+python -u full-supervised.py --data cora --layer 64 --alpha 0.2 --weight_decay 1e-4 --variant
+python -u full-supervised.py --data citeseer --layer 64 --weight_decay 5e-6
+python -u full-supervised.py --data citeseer --layer 64 --weight_decay 5e-6 --variant
+python -u full-supervised.py --data pubmed --layer 64 --alpha 0.1 --weight_decay 5e-6
+python -u full-supervised.py --data pubmed --layer 64 --alpha 0.1 --weight_decay 5e-6 --variant
+python -u full-supervised.py --data chameleon --layer 8 --lamda 1.5 --alpha 0.2 --weight_decay 5e-4
+python -u full-supervised.py --data chameleon --layer 8 --lamda 1.5 --alpha 0.2 --weight_decay 5e-4 --variant
+python -u full-supervised.py --data cornell --layer 16 --lamda 1 --weight_decay 1e-3
+python -u full-supervised.py --data cornell --layer 16 --lamda 1 --weight_decay 1e-3 --variant
+python -u full-supervised.py --data texas --layer 32 --lamda 1.5 --weight_decay 1e-4
+python -u full-supervised.py --data texas --layer 32 --lamda 1.5 --weight_decay 1e-4 --variant
+python -u full-supervised.py --data wisconsin --layer 16 --lamda 1 --weight_decay 5e-4
+python -u full-supervised.py --data wisconsin --layer 16 --lamda 1 --weight_decay 5e-4 --variant
+```
+Full|Cora|Cite.|Pumb.|Cham.|Corn.|Texa.|Wisc.
+---|---|---|---|---|---|---|---
+GCNII(paper)|88.49(64)|77.08(64)|89.57(64)|60.61(8)|74.86(16)|69.46(32)|74.12(16)
+GCNII*(paper)|88.01(64)|77.13(64)|90.30(64)|62.48(8)|76.49(16)|77.84(32)|81.57(16) 
+GCNII|88.37(31.05)|76.94(9.03)|89.59(201.72)|59.56(5.40)|74.86(8.43)|72.97(9.79)|73.73(7.62)
+GCNII*|88.25(31.64)|77.36(9.05)|90.24(162.20)|61.32(3.82)|77.30(6.91)|77.84(8.58)|81.37(6.37)
+GCNII_|88.37(31.57)|76.86(9.00)|89.58(200.12)|40.08(12.89)|71.4(11.90)|76.76(15.35)|79.02(11.07)
+GCNII*_|88.43(31.06)|76.78(9.40)|90.27(169.98)|48.36(8.42)|66.49(6.59)|78.11(14.05)|79.80(11.48)
+
+```
+显然，复现的代码在Cham. Corn. 数据上表现很差，
+第一次修改：(原)数据转化邻接矩阵按照无向图转化-->有向图，使得Corn表现有了提升。
+但依然有差距，具体原因暂时未发现。
+```
