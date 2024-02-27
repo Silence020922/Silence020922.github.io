@@ -2,7 +2,6 @@
 date: 2024-01-07
 title: Graph-scanning Algorithm
 tags:
-- DFS,BFS
 - Combinatorial Optimizition
 description:  图搜索算法的理论及其证明，算法代码，实例的迭代过程、正确性证明、时间复杂度及其数据结构等方面总结
 ---

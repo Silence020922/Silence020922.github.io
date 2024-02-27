@@ -2,8 +2,7 @@
 date: 2024-01-04
 title: Effects of GC
 tags:
-- GC
-- Theory
+- GNN
 description: 8-th，自GNN面世后，衍生了很多的变式，也存在很多实际的应用。但对向神经网络中添加卷积算子的意义本身，却缺乏理论上的证明，本文将携带卷积算子的神经网络与不使用图信息的神经网络进行对比，从理论出发给出严密的证明。参考Effects of graph convolutions in multi-layer networks
 ---
 # Introduction

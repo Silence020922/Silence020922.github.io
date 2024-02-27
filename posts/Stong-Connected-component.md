@@ -2,7 +2,6 @@
 date: 2024-01-04
 title: Srong Connected component in digraph
 tags:
-- Strong Connected Component
 - Combinatorial Optimizition
 description: 有向图强连通分支算法的理论及其证明，算法代码，实例的迭代过程、正确性证明、时间复杂度及其数据结构等方面总结
 ---

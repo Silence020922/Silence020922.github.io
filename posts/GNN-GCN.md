@@ -3,7 +3,6 @@ date: 2023-12-04
 title: GCN
 tags:
 - GNN
-- GCN
 description: 4-th,参考SEMI-surperised classification with graph convolutional networks
 ---
 # GCN

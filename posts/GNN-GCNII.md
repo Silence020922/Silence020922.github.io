@@ -3,7 +3,6 @@ date: 2023-12-09
 title: GCNII
 tags:
 - GNN
-- GCNII
 description: 6-th,参考SEMI-surperised classification with graph convolutional networks
 ---
 # Graph Convolutional Network via Initial residual and  Identity mapping (GCNII)

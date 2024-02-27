@@ -2,8 +2,7 @@
 date: 2024-02-21
 title: FlashAttention
 tags:
-- Transformer
-- FlashAttention 
+- LLM
 description: 加速transormer模型训练速度，以便应用到较长上下文中。
 ---
 参考[*FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness*](https://arxiv.org/abs/2205.14135)，事实上本文仅关心训练速度，并未在`Attention`计算上进行操作。

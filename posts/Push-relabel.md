@@ -2,7 +2,6 @@
 date: 2024-01-12
 title: Push-relabel Algorithm
 tags:
-- push-relabel
 - Combinatorial Optimizition
 description: Push-relabel推流重标算法的理论及其证明，算法代码，实例的迭代过程、正确性证明、时间复杂度及其数据结构等方面总结
 ---

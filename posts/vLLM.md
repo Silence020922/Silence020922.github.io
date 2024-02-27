@@ -2,8 +2,7 @@
 date: 2024-02-21
 title: vLLM
 tags:
-- vLLM
-- pagedAttention 
+- LLM
 description: LLM增添内存管理，利用PagedAttention，提高服务器吞吐量。
 ---
 ## 面对问题
