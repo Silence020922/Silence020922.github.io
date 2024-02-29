@@ -8,7 +8,9 @@ description: 6-th,参考SEMI-surperised classification with graph convolutional 
 # Graph Convolutional Network via Initial residual and  Identity mapping (GCNII)
 上结论
 $$
-\widetilde{P} = \widetilde{D}^{-\frac{1}{2}}\widetilde{A}\widetilde{D}^{-\frac{1}{2}}\\
+\widetilde{P} = \widetilde{D}^{-\frac{1}{2}}\widetilde{A}\widetilde{D}^{-\frac{1}{2}}
+$$
+$$
 H^{(l+1)} = \sigma(((1-\alpha_l)\widetilde{P}H^{(l)} + \alpha_l H^{(0)}) ((1-\beta_l)I_n + \beta_lW^{(l)}))
 $$
 ## GCN应用
