@@ -162,7 +162,43 @@ GCNII*_|88.43(31.06)|76.78(9.40)|90.27(169.98)|61.43(3.80)|76.49(7.30)|77.45(11.
 显然，复现的代码在Cham. Corn. 数据上表现很差，
 第一次修改：(原)数据转化邻接矩阵按照无向图转化-->有向图，使得Corn表现有了提升。
 但依然有差距，具体原因暂时未发现。
-第二次修改: 发现数据处理过程中错误的将Cham. Corn. Texa. 数据的标签类别数量输出错误，修改后 Corn. 回归到正常水平，同时，Wisc. Texa. 准确率下降到正常水平。
+第二次修改: 发现数据处理过程中错误的将Cham. Corn. Texa. 数据的标签类别数量输出错误，修改后 Corn. 回归到正常水平。
 第三次修改: 针对 Cham. 进行修改，原理尚不明确，但由于数据转化改为有向图，当实验中将原本输出的邻接矩阵A变为A.transpose()后，准确率恢复到正常水平。
 ```
 <!-- 产生疑问： 由于标签类别数量输出错误，这实际上导致在最后一层Linear层时输出了错误的预测向量(对单个样本来讲维度大于类别数量)，但由于log_softmax及argmax的存在，事实上最终也能给出一个类别(模型内无报错)，由于大于类别数量之后的类别输出显然是错误的(虚构)，在梯度反向时候也能够鼓励模型寻找正确的分类，事实上，这不会降低模型的精度，反而在一些数据上具有提升(代价为训练时间)，下面将其Linear输出的维度设置为100*class_num进行训练。 -->
+### 补充
+```tip
+由于先前对新数据标签类别数量输出有错误，记得先前有文章论述为什么在处理一些有向图时GNN仍然等同于无向图对待。查询了Cham. Corn. Texa. Wisc. 的数据信息，也没发现为什么一定是有向图，于是利用下述代码在处理数据过程中生成有向图并重新进行了全监督实验。
+```
+```python
+def load_new_data(dataset_str):
+    G = nx.Graph()
+    with open('new_data/{}/out1_graph_edges.txt'.format(dataset_str)) as adj_list:
+        adj_list.readline()
+        for line in adj_list:
+            str_list =line.split()
+            if int(str_list[0]) not in G:
+                G.add_node(int(str_list[0]))
+            elif int (str_list[1]) not in G:
+                G.add_node(int(str_list[1]))
+            G.add_edge(int(str_list[0]),int(str_list[1]))
+    adj = nx.adjacency_matrix(G,sorted(G.nodes()))
+    tmp = adj.todense()
+    assert(np.all(tmp == tmp.transpose(0,1))) # 确保A为对称矩阵——无向图
+    labels = list()
+    features = list()
+    with open('new_data/{}/out1_node_feature_label.txt'.format(dataset_str)) as node_feature_label :
+        node_feature_label.readline()
+        for line in node_feature_label:
+            line_list = line.split()
+            labels.append(int(line_list[-1]))
+            tmp = np.array(line_list[1].split(','),dtype= int)
+            features.append(tmp)
+    features = sp.lil_array(features,dtype=float)
+    labels = np.array(labels)
+    return adj,features,labels
+```
+Full|Cora|Cite.|Pumb.|Cham.|Corn.|Texa.|Wisc.
+---|---|---|---|---|---|---|---
+GCNII_|88.32(33.30)|77.35(9.37)|89.91(203.65)|55.91(6.97)|80.34(10.26)|78.98(9.31)|79.13(7.63)
+GCNII*_|88.24(29.34)|77.52(9.31)|90.58(170.58)|53.59(3.72)|81.86(8.71)|83.22(9.34)|82.75(7.24)
