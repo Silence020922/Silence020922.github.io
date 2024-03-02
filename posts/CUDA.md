@@ -1,9 +1,9 @@
 ---
-date: 2024-03-01c
+date: 2024-03-01
 title: CUDA编程
 tags:
 - CUDA
-description: ......
+description: 无...
 ---
 # 入门(with C++)
 这部分资源来自B站视频，[权双](https://www.bilibili.com/video/BV1sM4y1x7of/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=51a76af86bf4fcc9da32a69c092094ea)，作为入门+快速了解。
