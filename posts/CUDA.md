@@ -93,3 +93,41 @@ cudaError_t ErrorCheck(cudaError_t error_code, const char* filename, int linenum
     return error_code;
 }
 ```
+### 检查核函数
+错误检查函数无法捕捉调用核函数相关错误，由于`__global__ void`，核函数不会返回错误值，可使用如下代码捕捉核函数中的可能错误。
+```c++
+ErrorCheck(cudaGetLastError(),__FILE__,__LINE__);// 返回上一条cuda_Error
+ErrorCheck(cudaDeviceSynchronize(),__FILE__,__LINE__); //由于CPU与GPU异步，需在此加入一个同步函数，等待核函数运行完成。
+```
+## CUDA记时
+### 事件记时
+程序执行时间计时，是CUDA程序执行性能的重要表现，使用[事件记时](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__EVENT.html)方式。框架如下
+```c++
+cudaEvent_t start, stop; // 定义用来记时的CUDA事件变量
+ErrorCheck(cudaEventCreate(&start), __FILE__, __LINE__); //初始化事件
+ErrorCheck(cudaEventCreate(&stop), __FILE__, __LINE__);
+ErrorCheck(cudaEventRecord(start), __FILE__, __LINE__); // 记录代表时间开始的事件
+cudaEventQuery(start);	//此处不可用错误检测函数，cudaErrorNotReady
+
+addFromGPU<<<grid, block>>>(fpDevice_A, fpDevice_B, fpDevice_C, iElemCount);    // 核函数，需要记时的代码
+
+ErrorCheck(cudaEventRecord(stop), __FILE__, __LINE__); // 记录代表时间结束的事件
+ErrorCheck(cudaEventSynchronize(stop), __FILE__, __LINE__);
+float elapsed_time;
+ErrorCheck(cudaEventElapsedTime(&elapsed_time, start, stop), __FILE__, __LINE__); //计算两个work间的elapsed time
+// printf("Time = %g ms.\n", elapsed_time);
+
+if (repeat > 0) // 不计入第0次的情况，这是由于第一次调用核函数往往时间更多
+{
+    t_sum += elapsed_time;
+}
+
+ErrorCheck(cudaEventDestroy(start), __FILE__, __LINE__); // 销毁前面定义的时间类型变量
+ErrorCheck(cudaEventDestroy(stop), __FILE__, __LINE__);
+```
+### nvprof 性能刨析工具
+`nvprof`是一个可执行文件，执行方式为: `nvprof ./exe_name`。    
+:::tip
+目前较新的GPU可能不再支持nvprof，可替换为Nsight System，Arch系统下包含在cuda-tools包中，执行nsys进行分析。
+:::
+## 运行时GPU信息的查询
