@@ -131,3 +131,74 @@ ErrorCheck(cudaEventDestroy(stop), __FILE__, __LINE__);
 目前较新的GPU可能不再支持nvprof，可替换为Nsight System，Arch系统下包含在cuda-tools包中，执行nsys进行分析。
 :::
 ## 运行时GPU信息的查询
+查询熟知自身GPU性各项能才能高效进行CUDA程序开发，参考[Nvida doc](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__DEVICE.html)
+### 运行时API查询GPU信息
+GPU硬件知识参考[知乎](https://zhuanlan.zhihu.com/p/462191421)，`prop`结构体中包含的信息参考[Nvida](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__DEVICE_g5aa4f47938af8276f08074d09b7d520c.html#g5aa4f47938af8276f08074d09b7d520c)
+```c++
+int device_id = 0; // 设置设备ID
+ErrorCheck(cudaSetDevice(device_id), __FILE__, __LINE__); // 设置使用的GPU
+
+cudaDeviceProp prop; // 结构体，存储GPU相关属性
+ErrorCheck(cudaGetDeviceProperties(&prop, device_id), __FILE__, __LINE__);
+```
+### 查询GPU计算核心数量
+无运行时API可直接查询，根据其主版本号，次版本号及SM数量，使用下面函数可计算
+```c++
+#include <stdio.h>
+#include "./tools/setDevice.cuh"
+
+int getSPcores(cudaDeviceProp devProp)
+{  
+    int cores = 0;
+    int mp = devProp.multiProcessorCount;
+    switch (devProp.major){
+     case 2: // Fermi
+      if (devProp.minor == 1) cores = mp * 48;
+      else cores = mp * 32;
+      break;
+     case 3: // Kepler
+      cores = mp * 192;
+      break;
+     case 5: // Maxwell
+      cores = mp * 128;
+      break;
+     case 6: // Pascal
+      if ((devProp.minor == 1) || (devProp.minor == 2)) cores = mp * 128;
+      else if (devProp.minor == 0) cores = mp * 64;
+      else printf("Unknown device type\n");
+      break;
+     case 7: // Volta and Turing
+      if ((devProp.minor == 0) || (devProp.minor == 5)) cores = mp * 64;
+      else printf("Unknown device type\n");
+      break;
+     case 8: // Ampere
+      if (devProp.minor == 0) cores = mp * 64;
+      else if (devProp.minor == 6) cores = mp * 128;
+      else if (devProp.minor == 9) cores = mp * 128; // ada lovelace
+      else printf("Unknown device type\n");
+      break;
+     case 9: // Hopper
+      if (devProp.minor == 0) cores = mp * 128;
+      else printf("Unknown device type\n");
+      break;
+     default:
+      printf("Unknown device type\n"); 
+      break;
+      }
+    return cores;
+}
+
+int main()
+{
+    int device_id = 0;
+    ErrorCheck(cudaSetDevice(device_id), __FILE__, __LINE__);
+    
+
+    cudaDeviceProp prop;
+    ErrorCheck(cudaGetDeviceProperties(&prop, device_id), __FILE__, __LINE__);
+
+    printf("Compute cores is %d.\n", getSPcores(prop));
+
+    return 0;
+}
+```
