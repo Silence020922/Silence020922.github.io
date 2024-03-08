@@ -6,7 +6,8 @@ tags:
 description: 无...
 ---
 # 入门(with C++)
-这部分资源来自B站视频，[权双](https://www.bilibili.com/video/BV1sM4y1x7of/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=51a76af86bf4fcc9da32a69c092094ea)，作为入门+快速了解。
+这部分资源来自B站视频，[权双](https://www.bilibili.com/video/BV1sM4y1x7of/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=51a76af86bf4fcc9da32a69c092094ea)，作为入门+快速了解。    
+参考[Nvida-zh](https://developer.nvidia.cn/cuda-gpus#collapseOne)了解支持CUDA的Nvida GPU型号。
 ## Hello World
 ```cpp
 #include <stdio.h>
@@ -202,3 +203,30 @@ int main()
     return 0;
 }
 ```
+## 组织线程模型
+数据在内存中以线性，以行为主的方式存储。发挥GPU中多线程的优点，就是要让每个线程处理不同的数据运算，必须合理的组织线程，避免多个线程处理同一数据或胡乱访问内存的情况出现。
+### 二维网格二维线程块
+```
+ix = threadIdx.x + blockIdx.x*blockDim.x;
+iy = threadIdx.y + blockIdx.y+blockDim.y;
+idx = iy*nx + ix;
+```
+### 二维网格一维线程块
+```
+ix = threadIdx.x + blockIdx.x * blockDim.x;
+iy = blockIdx.y;
+idx = iy * nx + ix;
+```
+### 一维网格一维线程块
+此时无法做到每个线程对应矩阵中一个元素，需要循环执行。
+```c++
+__global__ void addMatrix(int *A, int *B, int *C, const int nx, const int ny)
+{
+    int ix = threadIdx.x + blockIdx.x * blockDim.x; // 此时iy 由循环执行决定
+    for (int iy = 0; iy < ny; iy++)
+    {
+        int idx = iy * nx + ix;
+        C[idx] = A[idx] + B[idx];
+    }
+}
+``` 
