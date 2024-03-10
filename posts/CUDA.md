@@ -5,10 +5,10 @@ tags:
 - CUDA
 description: 无...
 ---
-# 入门(with C++)
-这部分资源来自B站视频，[权双](https://www.bilibili.com/video/BV1sM4y1x7of/?spm_id_from=333.1007.top_right_bar_window_history.content.click&vd_source=51a76af86bf4fcc9da32a69c092094ea)，作为入门+快速了解。    
+# 入门(with C++)  
 参考[Nvida-zh](https://developer.nvidia.cn/cuda-gpus#collapseOne)了解支持CUDA的Nvida GPU型号。
 ## Hello World
+核函数使用`__global__`进行修饰，其返回类型必须是`void`类型。在核函数中可以使用`return`关键字但不会返回任何值。核函数无法成为一个类的成员，通常情况下，使用一个包装函数对核函数进行调用，将包装函数定义为类的成员。
 ```cpp
 #include <stdio.h>
 
@@ -31,7 +31,10 @@ nvcc Hello2thread.cu -o Ex1 -arch=compute_61 -code=sm_80
 ```zsh
 nvcc Hello2thread.cu -o Ex2_fat -gencode arch=compute_50,code=sm_50 -gencode arch=compute_60,code=sm_60 -gencode arch=compute_70,code=sm_70 -gencode arch=compute_80,code=sm_80
 ```
-生成的可执行文件称为胖二进制文件，注意过多制定计算能力会增加编译时间和可执行文件的大小。
+生成的可执行文件称为胖二进制文件，注意过多制定计算能力会增加编译时间和可执行文件的大小。    
+:::tip
+注意网格与线程块大小具有限制，通常，网格大小在$x,y,z$上最大允许$2^{31} - 1$, 65535, 65535。线程块大小在$x,y,z$分别为1024, 1024, 1024且总的线程块大小不超过1024。
+:::
 ## NVCC即时编译
 参考[知乎](https://zhuanlan.zhihu.com/p/432674688)    
 大概用于在当前架构下生成更前向的虚拟架构的PTX代码，此时指定的两个计算能力都是虚拟架构的计算能力，且必须一致，例如： 若本人GPU不支持80架构
@@ -133,6 +136,9 @@ ErrorCheck(cudaEventDestroy(stop), __FILE__, __LINE__);
 :::
 ## 运行时GPU信息的查询
 查询熟知自身GPU性各项能才能高效进行CUDA程序开发，参考[Nvida doc](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__DEVICE.html)
+### GPU性能评价指标
+- 浮点数运算峰值，FLOPS
+- GPU内存、带宽。
 ### 运行时API查询GPU信息
 GPU硬件知识参考[知乎](https://zhuanlan.zhihu.com/p/462191421)，`prop`结构体中包含的信息参考[Nvida](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__DEVICE_g5aa4f47938af8276f08074d09b7d520c.html#g5aa4f47938af8276f08074d09b7d520c)
 ```c++
@@ -230,3 +236,135 @@ __global__ void addMatrix(int *A, int *B, int *C, const int nx, const int ny)
     }
 }
 ``` 
+## 全局内存
+对全局内存的访问将触发内存事务，也就是数据传输。在线程访问内存引发数据传输的过程中，传输的数据有的是线程所需要的，而有的是额外数据，对他们的传输产生了资源浪费，使用合并度对资源利用率进行衡量。
+### 合并与非合并访问
+合并度等于线程束请求的字节数除以由该请求导致的数据传输处理的全部数据的字节数。当合并度为100%也就是说线程数对全局内存的一次访问请求导致了最少的数据传输，我们称该访问为合并访问，否则为非合并的。    
+要分析一个访问是合并的还是非合并的，首先要明晰数据传对数据地址的要求(这里考虑全局内存的读取仅使用$L_2$缓存的情况)：
+    一次数据传输中从全局内存转移到$L_2$缓存的一片内存的首地址，一定是最小粒度的整数倍(这里为32)。例如，一次传输只能从全局内存中读取地址为0到31字节。以线程请求访问单精度浮点数(4字节)为例，一个线程束总共需要访问128字节，若这128字节的地址恰好为0到127，则此时仅4次传输即可，此时合并度为100%，为合并访问。
+下面给出实例
+:::tip
+CUDA运行时API cudaMalloc()分配内存的首地址至少为256字节的整数倍。
+:::
+```c++
+// 合并访问
+void __global__ add(float *x, float *y, float *z){
+    int n = threadIdx.x + blockIdx.x*blockDim.x;
+    z[n] = x[n] + y[n];
+}
+add<<<128,32>>>(x,y,z)
+```
+可以看到，核函数中对这几个指针的访问都是合并的。例如，在第一个线程块中的线程束将访问数组中的0到31个数据，对应着0到127字节的连续内存，是合并访问。
+```c++
+// 非合并访问
+void __global__ add(float *x, float *y, float *z){
+    int n = blockIdx.x + threadIdx.x*gridDim.x;
+    z[n] = x[n] + y[n];
+}
+add<<<128,32>>>(x,y,z)
+```
+如上，第一个线程块中的线程束将对数组中第0, 128, 256...元素进行访问，都不在同一个连续32字节的内存片段中，故需要访问32次，此时合并率为$\frac{4}{32} = 12.5\%$，为非合并访问。
+### 矩阵转置(例)
+下面为完整的矩阵转置的例子，代码中首先生成了一个给定大小的随机方阵，之后进行了转置并对核函数进行记时。值得一提的是，在两种核函数中都包含了一个合并访问和一个非合并访问，但其执行速度却不同。这是因为，如果编译器判断一个全局变量在整个核函数范围内只可读，则会自动使用`__ldg()`函数对数据的读取进行缓存，从而环节非合并访问带来的影响。而在写入操作是没有类似的函数可以调用的。
+```c++
+#include <stdio.h>
+#include "./tools/setDevice.cuh"
+
+// 设计核函数
+__global__ void transpose1(const float *A,float *B, const int N){
+    const int nx = threadIdx.x + blockDim.x*blockIdx.x;
+    const int ny = threadIdx.y + blockDim.y*blockIdx.y;
+    if (nx < N && ny< N){
+        B[nx*N + ny] = A[ny*N+nx]; // 此时对于A的内存访问为合并的，即读合并，写非合并。
+    }
+}
+
+__global__ void transpose2(const float *A, float *B, const int N){
+    const int nx = threadIdx.x + blockDim.x*blockIdx.x;
+    const int ny = threadIdx.y + blockDim.y*blockIdx.y;
+    if (nx < N && ny< N){
+        B[ny*N + nx] = __ldg(&A[nx*N+ny]); // 此时对于B的内存访问为合并的，即写合并，读非合并。
+    }
+}
+
+void initialData(float *addr, int elemCount)
+{
+    for (int i = 0; i < elemCount; i++)
+    {
+        addr[i] = (float)(rand() & 0xFF) / 10.f; // 做逻辑与操作，限制随机数不超过255/10
+    }
+    return;
+}
+
+
+int main(void){
+    SetGPU(); // 设置GPU
+    const int N = 128; // 设置矩阵大小
+    int iElemCount = N*N;             // 设置元素数量
+    size_t stBytesCount = iElemCount * sizeof(float); // 字节数
+    // 分配主机内存
+    float *fpHost_A, *fpHost_B;
+    fpHost_A = (float *)malloc(stBytesCount); // 分配动态内存
+    fpHost_B = (float *)malloc(stBytesCount);
+    if (fpHost_A != NULL && fpHost_B != NULL)
+    {
+        memset(fpHost_A, 0, stBytesCount);  // 主机内存初始化为0
+        memset(fpHost_B, 0, stBytesCount);
+    }
+    else
+    {
+        printf("Fail to allocate host memory!\n");
+        exit(-1);
+    }
+
+    float *fpDevice_A, *fpDevice_B;
+    ErrorCheck(cudaMalloc((float**)&fpDevice_A, stBytesCount), __FILE__, __LINE__);
+    ErrorCheck(cudaMalloc((float**)&fpDevice_B, stBytesCount), __FILE__, __LINE__);
+    if (fpDevice_A != NULL && fpDevice_B != NULL){
+    ErrorCheck(cudaMemset(fpDevice_A, 0, stBytesCount), __FILE__, __LINE__); // 设备内存初始化为0
+    ErrorCheck(cudaMemset(fpDevice_B, 0, stBytesCount), __FILE__, __LINE__);
+    }
+    else{
+        printf("fail to allocate memory\n");
+        free(fpHost_A); // 释放先前CPU中制定的内存
+        free(fpHost_B);
+        exit(-1);
+    }
+
+     // 初始化主机中数据
+    srand(666); // 设置随机种子
+    initialData(fpHost_A, iElemCount);
+    // 主机复制到设备
+    ErrorCheck(cudaMemcpy(fpDevice_A,fpHost_A,stBytesCount,cudaMemcpyHostToDevice),__FILE__,__LINE__);
+    ErrorCheck(cudaMemcpy(fpDevice_B,fpHost_B,stBytesCount,cudaMemcpyHostToDevice),__FILE__,__LINE__);
+   
+    // 调用核函数
+    const dim3 block(32,32); // 设置block大小为2维32, 32
+    dim3 grid((N-1)/32 + 1,(N-1)/32 + 1); //向上取整，设置grid大小
+    // 预热
+    transpose1<<<grid, block>>>(fpDevice_A, fpDevice_B,N); 
+    // 设置开始事件
+    cudaEvent_t start, stop; 
+    ErrorCheck(cudaEventCreate(&start), __FILE__, __LINE__);
+    ErrorCheck(cudaEventCreate(&stop), __FILE__, __LINE__);
+    ErrorCheck(cudaEventRecord(start), __FILE__, __LINE__);
+    cudaEventQuery(start);
+
+    transpose1<<<grid, block>>>(fpDevice_A, fpDevice_B,N);  //调用核函数
+
+    ErrorCheck(cudaEventRecord(stop), __FILE__, __LINE__);
+    ErrorCheck(cudaEventSynchronize(stop), __FILE__, __LINE__);
+    float elapsed_time;
+    ErrorCheck(cudaEventElapsedTime(&elapsed_time, start, stop), __FILE__, __LINE__);
+    printf("Time = %g ms.\n", elapsed_time); // 打印时间
+    // 将计算得到的数据从设备传给主机
+    ErrorCheck(cudaMemcpy(fpHost_B, fpDevice_B, stBytesCount, cudaMemcpyDeviceToHost),__FILE__,__LINE__);
+    // 释放主机与设备内存
+    free(fpHost_A);
+    free(fpHost_B);
+    ErrorCheck(cudaFree(fpDevice_A), __FILE__, __LINE__);
+    ErrorCheck(cudaFree(fpDevice_B), __FILE__, __LINE__);
+    ErrorCheck(cudaDeviceReset(), __FILE__, __LINE__);
+    return 0;
+}
+```
