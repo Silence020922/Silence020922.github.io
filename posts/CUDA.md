@@ -368,3 +368,32 @@ int main(void){
     return 0;
 }
 ```
+## 共享内存
+### 数组归约计算(例)
+数组规约计算即考虑有$N$个元素的数组$x$，计算其所有元素的和。在使用CPU计算时，如下代码，使用`-DUSE_DP`设置精度，其运行结果(具体代码见 github )
+```zsh
+nvcc -O3 reduce_cpu.cu -o reduce_cpu
+./reduce_cpu 
+>>> Time = 129.05 ms.
+>>> Ans: 33554432.000000
+```
+```zsh
+nvcc -O3 -DUSE_DP reduce_cpu.cu -o reduce_cpu
+./reduce_cpu
+>>> Time = 69.4968 ms.
+>>> Ans: 123000000.110771
+```
+CPU运算情况下，其单精度下的结果完全是错误的。在仅使用全局内存的情况下设计核函数
+```zsh
+nvcc -O3  reduce_cpu.cu -o reduce_gpu
+./reduce_gpu
+>>> Time = 6.23568 ms.
+>>> Sum: 123633392.000000
+```
+```zsh
+nvcc -O3 -DUSE_DP reduce_cpu.cu -o reduce_gpu
+./reduce_gpu
+>>> Time = 131.485 ms.
+>>> Ans: 123000000.110771
+```
+GPU运算情况下，单精度时从第四位开始有错误，且计算速度约为CPU下的11倍。
