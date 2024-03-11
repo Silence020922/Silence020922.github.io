@@ -393,7 +393,55 @@ nvcc -O3  reduce_cpu.cu -o reduce_gpu
 ```zsh
 nvcc -O3 -DUSE_DP reduce_cpu.cu -o reduce_gpu
 ./reduce_gpu
->>> Time = 131.485 ms.
+>>> Time =  11.6348 ms.
 >>> Ans: 123000000.110771
 ```
-GPU运算情况下，单精度时从第四位开始有错误，且计算速度约为CPU下的11倍。
+仅使用全局内存的GPU运算情况下，单精度时从第四位开始有错误，且计算速度约为CPU下的11倍。
+```zsh
+nvcc -O3 reduce_share.cu -o reduce_share
+./reduce_share
+>>> Time = 5.87258 ms.
+>>> Ans: 123633392.000000
+```
+```zsh
+nvcc -O3 -DUSE_DP reduce_share.cu -o reduce_share
+./reduce_share
+>>> Time = 12.1048 ms.
+>>> Ans: 122999999.998770
+```
+使用静态共享内存下GPU运算情况。考虑到全局内存的访问速度是所有内存中最低的，应减少对其使用。而寄存器是最高效的，但他只对线程可见，考虑到需要线程合作，采用线程块可见的共享内存。代码见github，一般来讲使用共享内存减少全局内存访问可以提高性能，但并不是绝对如此。但这至少带来了一个好处，现在我们的代码允许数组元素个数不是线程块大小的整数倍。
+### 矩阵转置(例)
+下面将之前的矩阵转置利用共享内存改写，
+```c++
+// 设计核函数
+__global__ void transpose1(const float *A,float *B, const int N){
+    const int nx = threadIdx.x + blockDim.x*blockIdx.x;
+    const int ny = threadIdx.y + blockDim.y*blockIdx.y;
+    __shared__ float S[32][33];
+    
+    if (nx < N && ny < N){
+        S[threadIdx.y][threadIdx.x] = A[ny*N + nx]; // 合并访问，copy操作
+    }
+    __syncthreads();
+    const int nx2 = threadIdx.y + blockDim.x*blockIdx.x;
+    const int ny2 = threadIdx.x + blockDim.y*blockIdx.y;
+    if (nx2 < N && ny2< N){
+        B[nx2*N + ny2] = S[threadIdx.x][threadIdx.y]; // 调换threadIdx.x 和 threadIdx.y 使得对B的访问也是合并的 
+    }
+}
+```
+通过改写核函数，使得对A,B的访问都是合并的下面几行代码极为关键，仔细体会其正确性。
+```c++
+const int nx2 = threadIdx.y + blockDim.x*blockIdx.x;
+const int ny2 = threadIdx.x + blockDim.y*blockIdx.y;
+if (nx2 < N && ny2< N){
+    B[nx2*N + ny2] = S[threadIdx.x][threadIdx.y]; // 调换threadIdx.x 和 threadIdx.y 使得对B的访问也是合并的 
+}
+```
+### bank冲突
+`bank`：为了获得高的内存带宽，共享内存在物理上被分为32(=wrap_size)同样宽度，可以被同时访问的内存bank，除了开普勒架构(8字节)，其他架构每个bank的宽度为4字节。    
+共享内存数组是按照如下方式映射到内存bank中    
+![](https://img-blog.csdnimg.cn/71b1a7e6d32f42b98b35c7071dfa9276.jpeg)
+简单说来，第0到31个数组元素在32个bank的第一层，第32到63个数组元素在32个bank的第二层...    
+当同一个线程束内的多个线程不同时访问一个bank,此时由于不同bank可以同时访问，只需要发起一次访问请求，进行一次内存事务。但如果多个线程访问同一个bank中不同层数据，就会产生**bank冲突**，影响程序执行时间。    
+在矩阵转置代码中，如果设置`__shared__ float S[32][32];`，则`B[nx2*N + ny2] = S[threadIdx.x][threadIdx.y]; `操作中，对于同一线程束中的线程(Idx.x连续)，这32个线程恰好访问同一个bank的32个数据，发生**32路bank冲突**。在改变共享内存的数组大小之后`__shared__ float S[32][33];`，同一个线程束中的32个线程(连续的32个threadIdx.x的值)将对应共享内存数组S中跨度为33的数据，如果第一个线程访问第一个bank的第一层；第二个线程会访问第二个bank的第二层，于是这32个线程将分别访问32个不同的bank中的数据，所以没有bank冲突。
