@@ -15,6 +15,7 @@ description: 加速transormer模型训练速度，以便应用到较长上下文
     补充GPU工作原理
 计算过程中，首先将HBM中的数据加载和写入到SRAM中，在SRAM中完成计算将数据传回并写入HBM。
 ## 解决思路
+补充一个不错的[blog](https://www.zhihu.com/question/611236756)
 ### 关键在减少对HBM的读写
 现有的方法(例如稀疏逼近，低秩逼近或者是它们的结合)着眼于减少FLOPS开销，而这些改进下的wall-clock speed 较原始框架并未有明显改进，这暗示了FLOPS并不是通常情况下的瓶颈。传统的`Self-Attn`过程需要重复的从HBM中进行R\W，[*Data Movement Is All You Need: A Case Study on Optimizing Transformers*](https://arxiv.org/abs/2007.00072)一文中也说明了真正的bound在于Data move。    
 本文 **Fig1 right** 中展示dropout mask甚至花费了更长的时间，这非常反常理，由于Mask阶段设计小浮点数的计算，但事实上过程中的读写量比矩阵大得多，这也反映了注意力组件的bound主要由于数据的R\W。    
