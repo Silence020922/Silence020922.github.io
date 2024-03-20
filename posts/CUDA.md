@@ -487,3 +487,93 @@ thread_block_tile<32> g32 = tiled_partition<32>(this_thread_block())
 -  `T __xor_sync(T,v,int laneMask)`
 
 相比于普通线程束内基本函数，第一少了第一个位置的mask参数，其默认组内所有线程都参与计算，第二是洗牌少了最后一个参数，因为该宽度就是线程块片的大小。
+## CUDA流
+### 概述
+CUDA程序的并行层次主要有两个：核函数内部的并行，核函数外部的并行。在此之前，关注的都是内部的并行，外部并行主要指：
+- 核函数计算与数据传输之间的并行
+- 主机计算与数据传输之间的并行
+- 不同数据传输之间并行
+- 核函数计算与主机计算间并行
+- 不同核函数之间并行
+
+一个`CUDA stream`指的是由主机(或设备)发出的在一个设备中执行的CUDA操作，这里不考虑设备发出的流。任何CUDA操作都存在于某个CUDA流中，要么是默认流(空流)，要么是明确指定的非空流，非默认流使用如下方法在主机中定义、产生和销毁
+```c++
+cudaStream_t stream_1;
+cudaStreamCreate(&stream_1);
+cudaStreamDestroy(stream_1);
+```
+为了检查一个CUDA流中的所有操作是否都已在设备内执行完成，CUDA运行时API提供
+```
+cudaError_t cudaStreamSynchronize(cudaStream_t stream); // 强制阻塞主机，等待CUDA流中的所有操作执行完毕
+cudaError_t cudaStreamQuery(cudaStream_t stream); // 不会阻塞，仅查询
+```
+### 默认流中重叠主机和设备计算
+```c++
+cudaMemcpy();
+cudaMemcpy();
+sum<<<>>>(); // 核函数
+cudaMemcpy();
+```
+上述代码处于默认流中，从主机的角度看，在执行`cudaMemcpy`后会等待命令执行完毕，再往前走。但主机处理核函数时是异步的，即发出指令后立刻夺回控制权，但由于他们处于默认流中，下一个指令并不会立刻执行。但我们可以看到，主机发出核函数调用指令后会立刻发出下一个命令，利用这个原理，将主机计算放到核函数之后可提高性能，例如若`sum_cpu`与`sum_gpu`同等耗时。
+```c++
+// 耗时短
+sum_gpu<<<>>>();
+sum_cpu();
+
+// 耗时长
+sum_cpu();
+sum_gpu<<<>>>();
+```
+### 非默认CUDA流中重叠多个核函数执行
+要实现多个核函数之间的并行必须使用多个CUDA流。在使用非默认流时，核函数执行配置如下：
+```c++
+kernel <<<N_grid,N_block,N_shared,stream_id>>>
+```
+设置多流并发处理确实可以加速性能，但也要兼顾GPU的计算资源和不同架构GPU上能够并发执行的核函数个数的上限。
+### 非默认CUDA流重叠核函数执行和数据传递
+要实现核函执行与数据传输并发，必须让两个操作处于不同的非默认流。且需要使用`cudaMem`异步版本(同步版本下，主机发送命令后需等待传输完成)，见下
+```c++
+cudaError_t cudaMemcpyAsync 	( 	void *  	dst,
+		const void *  	src,
+		size_t  	count,
+		enum cudaMemcpyKind  	kind,
+		cudaStream_t  	stream = 0	 
+	) 	
+```
+异步传输由GPU中的DMA直接实现，不需要主机参与。    
+使用异步传输函数时，需要声明主机内存为不可分页内存。否则，主机内存为分页内存时，数据传输过程在使用GPU中DMA之前必须将数据从可分页内存移动到不可分页内存，从而必须与主机同步，主机无法在发出命令后立刻获得控制权，则无法实现不同CUDA流之间的并发。不可分页内存的分配可由以下[两个](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__MEMORY_g15a3871f15f8c38f5b7190946845758c.html#g15a3871f15f8c38f5b7190946845758c)[函数](https://developer.download.nvidia.cn/compute/DevZone/docs/html/C/doc/html/group__CUDART__MEMORY_g9f93d9600f4504e0d637ceb43c91ebad.html#g9f93d9600f4504e0d637ceb43c91ebad)的任何一个实现
+```
+cudaError_t cudaMallocHost 	( 	void **  	ptr,
+		size_t  	size	 
+	) 	
+cudaError_t cudaHostAlloc 	( 	void **  	pHost,
+    size_t  	size,
+    unsigned int  	flags	 
+) 	
+```
+现在考虑主机与设备间的数据传输(H2D, D2H)，例如在理想情况下，程序只需要经过三个过程，
+H2D,KER(设备计算),D2H，此时如果简单的将三个过程放入三个不同的流中，显然是不能得到加速，这是因为三个操作在逻辑上具有先后顺序。
+$$
+\begin{align*}
+&stream0: H2D\\
+&stream1:\qquad \qquad \rightarrow KER\\
+&stream2: \qquad \qquad \qquad \qquad \rightarrow D2H
+\end{align*}
+$$
+要获得性能上提升，必须创造出逻辑上并行执行的CUDA操作，一种方法是将每一步CUDA操作等分为若干份。
+$$
+\begin{align*}
+&stream0: H2D \rightarrow KER \rightarrow D2H\\
+&stream1:\qquad \qquad H2D \rightarrow KER \rightarrow D2H\\
+\end{align*}
+$$
+性能提升$\frac{3}{2}$倍。
+$$
+\begin{align*}
+&stream0: H2D \rightarrow KER \rightarrow D2H\\
+&stream1:\qquad \qquad H2D \rightarrow KER \rightarrow D2H\\
+&stream2:\qquad \qquad \qquad \qquad H2D \rightarrow KER \rightarrow D2H\\
+\end{align*}
+$$
+性能提升$\frac{9}{5}$倍。    
+事实上，分为$n$份，理论上性能提升$\frac{3n}{n+2}$倍。但事实上，由于CUDA操作启动等额外开销，其加速比一般小于极限情况下的3。
