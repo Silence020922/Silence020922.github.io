@@ -456,3 +456,34 @@ if (nx2 < N && ny2< N){
 :::
 伏特架构之前，一个线程束中的线程拥有同一个程序计数器，但各自有不同的寄存器状态，从而可以根据程序的逻辑判断选择不同的分支。而从伏特架构开始，引入了独立线程调度，每个线程拥有自己的程序计数器，提高了编程的灵活性，降低了移植CPU代码的难度。其代价一是增加了寄存器的负担，单个线程的程序计数器一般需要两个寄存器，也就是说，这使得SM中每个线程可用寄存器数量减少2，代价二，独立线程调度机制使得假设了线程束同步的代码变得不再安全。对于代价二，后面会介绍函数`__syncwarp()`线程束同步，或者生成PTX代码使用帕斯卡架构的线程调度机制：
 `-arch=compute_60 -code=sm_89`。
+### 线程束内的线程同步函数
+### 更多线程束内基本函数
+参考[CSDN](https://blog.csdn.net/AAAA202012/article/details/122292950)
+，在伏特架构以后，使用这些函数必须使用带`_sync()`版本，即他们会有隐式的同步功能，自动处理读-写竞争的问题。
+### 协作组
+使用协作组功能时需在相关源文件下加入`#include <cooperative_groups.h>`头文件，还要注意所有与协作组相关的数据类型和函数都定义在命名空间`cooperative_groups`下，`using namespace cooperative_groups`。    
+协作组编程模型中最基本的类型是`thread_group`，该类型包含以下成员函数：
+- `void sync`: 同步组内所有线程
+- `unsigned size`: 返回组内总的线程数目
+- `unsigned thread_rank`:返回当前调用该函数的线程在组内的标号
+- `bool is_valid`:若定义的组违反了CUDA限制，返回`False`
+
+线程组类型有一个成为线程块`thread_block`的导出类型，该类型提供了两个额外函数
+- `dim3 group_index`: 相当于`blockIdx`
+- `dim3 thread_index`: 等价于`threadIdx`
+
+另外，介绍函数`tiled_partition`，他可以将线程块分为设置大小的多个线程片，每一片构成一个线程组，但其`size`设置限制在2的整数倍不超过32的整数，例如`thread_group g32 = tiled_partition(this_thread_block(),32)`。    
+特别的，若线程组的大小在编译期间就已知，可以使用如下模板
+```
+thread_block_tile<32> g32 = tiled_partition<32>(this_thread_block())
+```
+这样定义的线程组称为线程块片，线程块片额外享有如下定义的函数
+- `unsigned __ballot_sync(int predicate)`
+- `int __all_sync(int predicate)`
+- `int __any_sync(int predicate)`
+- `T __shfl_sync(T,v,int srcLane)`
+-  `T __up_sync(T,v,unsigned d)`
+-  `T __down_sync(T,v,unsigned d)`
+-  `T __xor_sync(T,v,int laneMask)`
+
+相比于普通线程束内基本函数，第一少了第一个位置的mask参数，其默认组内所有线程都参与计算，第二是洗牌少了最后一个参数，因为该宽度就是线程块片的大小。
