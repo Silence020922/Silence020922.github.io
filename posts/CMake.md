@@ -251,3 +251,77 @@ target_link_libraries(
     - PUBLIC：在public后面的库会被Link到前面的target中，并且里面的符号也会被导出，提供给第三方使用。
     - PRIVATE：在private后面的库仅被link到前面的target中，并且终结掉，第三方不能感知你调了啥库
     - INTERFACE：在interface后面引入的库不会被链接到前面的target中，只会导出符号。即对于如果A连接B和C，A无法获得自身所使用的函数来自B还是C。
+
+**示例1——官方动态库**    
+- 动态库的链接和静态库是完全不同的：
+
+    - 静态库会在生成可执行程序的链接阶段被打包到可执行程序中，所以可执行程序启动，静态库就被加载到内存中了。
+    - 动态库在生成可执行程序的链接阶段不会被打包到可执行程序中，当可执行程序被启动并且调用了动态库中的函数的时候，动态库才会被加载到内存
+
+因此，在cmake中指定要链接的动态库的时候，应该将命令写到生成了可执行文件之后：
+
+```cmake
+cmake_minimum_required(VERSION 3.0)
+project(TEST)
+file(GLOB SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+# 添加并指定最终生成的可执行程序名
+add_executable(app ${SRC_LIST})
+# 指定可执行程序要链接的动态库名字
+target_link_libraries(app pthread)
+```
+`target_link_libraries(app pthread)`中：
+
+    app: 对应的是最终生成的可执行程序的名字
+    pthread：这是可执行程序要加载的动态库，这个库是系统提供的线程库，全名为libpthread.so，在指定的时候一般会掐头（lib）去尾（.so）。
+
+**示例2——第三方**    
+```zsh
+$ tree 
+.
+├── build
+├── CMakeLists.txt
+├── include
+│   └── head.h            # 动态库对应的头文件
+├── lib
+│   └── libcalc.so        # 自己制作的动态库文件
+└── main.cpp              # 测试用的源文件
+
+3 directories, 4 files
+```
+假设在测试文件main.cpp中既使用了自己制作的动态库libcalc.so又使用了系统提供的线程库，此时CMakeLists.txt文件可以这样写：
+```cmake
+cmake_minimum_required(VERSION 3.0)
+project(TEST)
+file(GLOB SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+# 指定源文件或者动态库对应的头文件路径
+include_directories(${PROJECT_SOURCE_DIR}/include)
+# 指定要链接的动态库的路径
+link_directories(${PROJECT_SOURCE_DIR}/lib)
+# 添加并生成一个可执行程序
+add_executable(app ${SRC_LIST})
+# 指定要链接的动态库
+target_link_libraries(app pthread calc)
+```
+## 日志
+在CMake中可以用用户显示一条消息，该命令的名字为message
+```cmake
+message([STATUS|WARNING|AUTHOR_WARNING|FATAL_ERROR|SEND_ERROR] "message to display" ...)
+```
+- (无) ：重要消息
+- STATUS ：非重要消息
+- WARNING：CMake 警告, 会继续执行
+- AUTHOR_WARNING：CMake 警告 (dev), 会继续执行
+- SEND_ERROR：CMake 错误, 继续执行，但是会跳过生成的步骤
+- FATAL_ERROR：CMake 错误, 终止所有处理过程
+
+CMake的命令行工具会在stdout上显示STATUS消息，在stderr上显示其他所有消息。CMake的GUI会在它的log区域显示所有消息。
+
+CMake警告和错误消息的文本显示使用的是一种简单的标记语言。文本没有缩进，超过长度的行会回卷，段落之间以新行做为分隔符。
+```cmake
+# 输出一般日志信息
+message(STATUS "source path: ${PROJECT_SOURCE_DIR}")
+# 输出警告信息
+message(WARNING "source path: ${PROJECT_SOURCE_DIR}")
+# 输出错误信息
+message(FATAL_ERROR "source path: ${PROJECT_SOURCE_DIR}")
+```
