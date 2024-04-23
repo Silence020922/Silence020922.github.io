@@ -95,7 +95,6 @@ file(GLOB MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 :::tip
 CMAKE_CURRENT_SOURCE_DIR 宏表示当前访问的 CMakeLists.txt 文件所在的路径。关于要搜索的文件路径和类型可加双引号，也可不加:
 :::
-<!-- 
 ## include_directories——包含头文件
 举例说明，有源文件若干，其目录结构如下：
 ```zsh
@@ -126,7 +125,7 @@ file(GLOB SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_executable(app  ${SRC_LIST})
 ```
 其中，第六行指定就是头文件的路径，`PROJECT_SOURCE_DIR`宏对应的值就是我们在使用cmake命令时，后面紧跟的目录，一般是工程的根目录。
-
+<!--
 ## 静态库/动态库
 ### 制作静态库/动态库
 在cmake中，如果要制作静态库，需要使用的命令如下：
