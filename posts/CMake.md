@@ -378,6 +378,8 @@ message(STATUS "message: ${SRC_1}")
 ```
 ### list 其他命令
 [官方文档](https://cmake.org/cmake/help/latest/command/list.html#list)
+
+<!--
 - 获取 list 的长度
     ```cmake
     list(LENGTH <list> <output variable>)
@@ -469,7 +471,6 @@ message(STATUS "message: ${SRC_1}")
 
         - ASCENDING:按照升序排列，为默认值
         - DESCENDING：按照降序排列
-<!--
 ## 自定义宏
 在书写C++代码时会设置宏标明测试模式，通过这些宏来控制这些代码是否生效，例如
 ```c++
