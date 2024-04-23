@@ -125,7 +125,6 @@ file(GLOB SRC_LIST ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 add_executable(app  ${SRC_LIST})
 ```
 其中，第六行指定就是头文件的路径，`PROJECT_SOURCE_DIR`宏对应的值就是我们在使用cmake命令时，后面紧跟的目录，一般是工程的根目录。
-<!--
 ## 静态库/动态库
 ### 制作静态库/动态库
 在cmake中，如果要制作静态库，需要使用的命令如下：
@@ -301,6 +300,7 @@ add_executable(app ${SRC_LIST})
 # 指定要链接的动态库
 target_link_libraries(app pthread calc)
 ```
+<!--
 ## 日志
 在CMake中可以用用户显示一条消息，该命令的名字为message
 ```cmake
