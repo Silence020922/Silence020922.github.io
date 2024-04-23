@@ -328,7 +328,7 @@ message(FATAL_ERROR "source path: ${PROJECT_SOURCE_DIR}")
 ## 变量操作
 ### 拼接
 #### set
-```camke
+```cmake
 set(变量名1 ${变量名1} ${变量名2} ...)
 ```
 关于上面的命令其实就是将从第二个参数开始往后所有的字符串进行拼接，最后将结果存储到第一个参数中，如果第一个参数中原来有数据会对原数据就行覆盖。
@@ -388,7 +388,7 @@ message(STATUS "message: ${SRC_1}")
     - <list>：当前操作的列表
     - <output variable>：新创建的变量，用于存储列表的长度。
 - 读取列表中指定索引的的元素，可以指定多个索引
-    ```camke
+    ```cmake
     list(GET <list> <element index> [<element index> ...] <output variable>)
     ```
     - <list>：当前操作的列表
