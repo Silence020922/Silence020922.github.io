@@ -44,7 +44,6 @@ vim file1 file2 ... #可同时打开多个文件
 vim -On file1 file2 ... #对打开的文件执行左右分屏操作，n为具体文件数目
 vim -on file1 file2... #上下分屏
 ```
-## vim命令
 ### 正常模式
 #### 分屏
 - 按住ctrl+w后按下s,可上下分屏     
