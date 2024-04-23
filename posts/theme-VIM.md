@@ -1,8 +1,8 @@
 ---
-title: linux入门
 date: 2022-10-10
+title: linux入门
 tags: 
-- note
+- Linux
 description: 本专题仅为个人人无事做的学习记录
 ---
 ## VIM入门
