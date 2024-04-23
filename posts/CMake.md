@@ -379,42 +379,41 @@ message(STATUS "message: ${SRC_1}")
 ### list 其他命令
 [官方文档](https://cmake.org/cmake/help/latest/command/list.html#list)
 
-<!--
 - 获取 list 的长度
     ```cmake
     list(LENGTH <list> <output variable>)
     ```
-    - LENGTH：子命令LENGTH用于读取列表长度
-    - <list>：当前操作的列表
-    - <output variable>：新创建的变量，用于存储列表的长度。
+    - `LENGTH`：子命令LENGTH用于读取列表长度
+    - `<list>`：当前操作的列表
+    - `<output variable>`：新创建的变量，用于存储列表的长度。
 - 读取列表中指定索引的的元素，可以指定多个索引
     ```cmake
     list(GET <list> <element index> [<element index> ...] <output variable>)
     ```
-    - <list>：当前操作的列表
-    - <element index>：列表元素的索引
+    - `<list>`：当前操作的列表
+    - `<element index>`：列表元素的索引
 
         从0开始编号，索引0的元素为列表中的第一个元素；
         索引也可以是负数，-1表示列表的最后一个元素，-2表示列表倒数第二个元素，以此类推
         当索引（不管是正还是负）超过列表的长度，运行会报错
 
-    - <output variable>：新创建的变量，存储指定索引元素的返回结果，也是一个列表。
+    - `<output variable>`：新创建的变量，存储指定索引元素的返回结果，也是一个列表。
 - 将列表中的元素用连接符（字符串）连接起来组成一个字符串
     ```cmake
     list (JOIN <list> <glue> <output variable>)
     ```
-    - <list>：当前操作的列表
-    - <glue>：指定的连接符（字符串）
-    - <output variable>：新创建的变量，存储返回的字符串
+    - `<list>`：当前操作的列表
+    - `<glue>`：指定的连接符（字符串）
+    - `<output variable>`：新创建的变量，存储返回的字符串
 - 查找列表是否存在指定的元素，若果未找到，返回-1
     ```cmake
     list(FIND <list> <value> <output variable>)
     ```
-    - <list>：当前操作的列表
-    - <value>：需要再列表中搜索的元素
-    - <output variable>：新创建的变量
+    - `<list>`：当前操作的列表
+    - `<value>`：需要再列表中搜索的元素
+    - `<output variable>`：新创建的变量
 
-        - 如果列表<list>中存在<value>，那么返回<value>在列表中的索引
+        - 如果列表`<list>`中存在`<value>`，那么返回`<value>`在列表中的索引
         - 如果未找到则返回-1
 - 将元素追加到列表中
     ```cmake
@@ -521,4 +520,3 @@ add_executable(app ./test.c)
 |LIBRARY_OUTPUT_PATH |	重新定义目标链接库文件的存放位置|
 |PROJECT_NAME |	返回通过PROJECT指令定义的项目名称|
 |CMAKE_BINARY_DIR 	|项目实际构建路径，假设在build目录进行的构建，那么得到的就是这个目录的路径|
- -->
