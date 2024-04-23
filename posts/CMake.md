@@ -325,3 +325,200 @@ message(WARNING "source path: ${PROJECT_SOURCE_DIR}")
 # 输出错误信息
 message(FATAL_ERROR "source path: ${PROJECT_SOURCE_DIR}")
 ```
+## 变量操作
+### 拼接
+#### set
+```camke
+set(变量名1 ${变量名1} ${变量名2} ...)
+```
+关于上面的命令其实就是将从第二个参数开始往后所有的字符串进行拼接，最后将结果存储到第一个参数中，如果第一个参数中原来有数据会对原数据就行覆盖。
+```cmake
+cmake_minimum_required(VERSION 3.0)
+project(TEST)
+set(TEMP "hello,world")
+file(GLOB SRC_1 ${PROJECT_SOURCE_DIR}/src1/*.cpp)
+file(GLOB SRC_2 ${PROJECT_SOURCE_DIR}/src2/*.cpp)
+# 追加(拼接)
+set(SRC_1 ${SRC_1} ${SRC_2} ${TEMP})
+message(STATUS "message: ${SRC_1}")
+```
+#### list
+```cmake
+list(APPEND <list> [<element> ...])
+```
+list命令的功能比set要强大，字符串拼接只是它的其中一个功能，所以需要在它第一个参数的位置指定出我们要做的操作，APPEND表示进行数据追加，后边的参数和set就一样了。
+
+### 移除
+我们在通过file搜索某个目录就得到了该目录下所有的源文件，但是其中有些源文件并不是我们所需要的，比如：
+```zsh
+$ tree
+.
+├── add.cpp
+├── div.cpp
+├── main.cpp
+├── mult.cpp
+└── sub.cpp
+
+0 directories, 5 files
+
+```
+在当前这么目录有五个源文件，其中main.cpp是一个测试文件。如果我们想要把计算器相关的源文件生成一个动态库给别人使用，那么只需要add.cpp、div.cp、mult.cpp、sub.cpp这四个源文件就可以了。此时，就需要将main.cpp从搜索到的数据中剔除出去，想要实现这个功能，也可以使用list
+```cmake
+list(REMOVE_ITEM <list> <value> [<value> ...])
+```
+```cmake
+cmake_minimum_required(VERSION 3.0)
+project(TEST)
+set(TEMP "hello,world")
+file(GLOB SRC_1 ${PROJECT_SOURCE_DIR}/*.cpp)
+# 移除前日志
+message(STATUS "message: ${SRC_1}")
+# 移除 main.cpp
+list(REMOVE_ITEM SRC_1 ${PROJECT_SOURCE_DIR}/main.cpp)
+# 移除后日志
+message(STATUS "message: ${SRC_1}")
+```
+### list 其他命令
+[官方文档](https://cmake.org/cmake/help/latest/command/list.html#list)
+- 获取 list 的长度
+    ```cmake
+    list(LENGTH <list> <output variable>)
+    ```
+    - LENGTH：子命令LENGTH用于读取列表长度
+    - <list>：当前操作的列表
+    - <output variable>：新创建的变量，用于存储列表的长度。
+- 读取列表中指定索引的的元素，可以指定多个索引
+    ```camke
+    list(GET <list> <element index> [<element index> ...] <output variable>)
+    ```
+    - <list>：当前操作的列表
+    - <element index>：列表元素的索引
+
+        从0开始编号，索引0的元素为列表中的第一个元素；
+    索引也可以是负数，-1表示列表的最后一个元素，-2表示列表倒数第二个元素，以此类推
+    当索引（不管是正还是负）超过列表的长度，运行会报错
+
+    - <output variable>：新创建的变量，存储指定索引元素的返回结果，也是一个列表。
+- 将列表中的元素用连接符（字符串）连接起来组成一个字符串
+    ```cmake
+    list (JOIN <list> <glue> <output variable>)
+    ```
+    - <list>：当前操作的列表
+    - <glue>：指定的连接符（字符串）
+    - <output variable>：新创建的变量，存储返回的字符串
+- 查找列表是否存在指定的元素，若果未找到，返回-1
+    ```cmake
+    list(FIND <list> <value> <output variable>)
+    ```
+    - <list>：当前操作的列表
+    - <value>：需要再列表中搜索的元素
+    - <output variable>：新创建的变量
+
+        如果列表<list>中存在<value>，那么返回<value>在列表中的索引
+        如果未找到则返回-1
+- 将元素追加到列表中
+    ```cmake
+    list (APPEND <list> [<element> ...])
+    ```
+- 在list中指定的位置插入若干元素
+    ```cmake
+    list(INSERT <list> <element_index> <element> [<element> ...])
+    ```
+- 将元素插入到列表的0索引位置
+    ```cmake
+    list (PREPEND <list> [<element> ...])
+    ```
+- 将列表中最后元素移除
+    ```cmake
+    list (POP_BACK <list> [<out-var>...])
+    ```
+- 将列表中第一个元素移除
+    ```cmake
+    list (POP_FRONT <list> [<out-var>...])
+    ```
+- 将指定的元素从列表中移除
+    ```cmake
+    list (REMOVE_ITEM <list> <value> [<value> ...])
+    ```
+- 将指定索引的元素从列表中移除
+    ```cmake
+    list (REMOVE_AT <list> <index> [<index> ...])
+    ```
+- 移除列表中的重复元素
+    ```cmake
+    list (REMOVE_DUPLICATES <list>)
+    ```
+- 列表翻转
+    ```cmake
+    list(REVERSE <list>)
+    ```
+- 列表排序
+    ```cmake
+    list (SORT <list> [COMPARE <compare>] [CASE <case>] [ORDER <order>])
+    ```
+    - COMPARE：指定排序方法。有如下几种值可选：
+
+        - STRING:按照字母顺序进行排序，为默认的排序方法
+        - FILE_BASENAME：如果是一系列路径名，会使用basename进行排序
+        - NATURAL：使用自然数顺序排序
+
+    - CASE：指明是否大小写敏感。有如下几种值可选：
+
+        - SENSITIVE: 按照大小写敏感的方式进行排序，为默认值
+        - INSENSITIVE：按照大小写不敏感方式进行排序
+
+    - ORDER：指明排序的顺序。有如下几种值可选：
+
+        - ASCENDING:按照升序排列，为默认值
+        - DESCENDING：按照降序排列
+## 自定义宏
+在书写C++代码时会设置宏标明测试模式，通过这些宏来控制这些代码是否生效，例如
+```c++
+#include <stdio.h>
+#define NUMBER  3
+
+int main()
+{
+    int a = 10;
+#ifdef DEBUG
+    printf("我是一个程序猿, 我不会爬树...\n");
+#endif
+    for(int i=0; i<NUMBER; ++i)
+    {
+        printf("hello, GCC!!!\n");
+    }
+    return 0;
+}
+```
+在程序的第七行对DEBUG宏进行了判断，如果该宏被定义了，那么第八行就会进行日志输出，如果没有定义这个宏，第八行就相当于被注释掉了，因此最终无法看到日志输入出（上述代码中并没有定义这个宏）
+
+为了让测试更灵活，我们可以不在代码中定义这个宏，而是在测试的时候去把它定义出来，其中一种方式就是在gcc/g++命令中去指定，如下：
+```zsh
+$ gcc test.c -DDEBUG -o app
+```
+在gcc/g++命令中通过参数 -D指定出要定义的宏的名字，这样就相当于在代码中定义了一个宏，其名字为DEBUG。
+
+在CMake中我们也可以做类似的事情，对应的命令叫做`add_definitions`:
+```cmake
+add_definitions(-D宏名称)
+```
+针对于上面的源文件编写一个CMakeLists.txt，内容如下
+```cmake
+cmake_minimum_required(VERSION 3.0)
+project(TEST)
+# 自定义 DEBUG 宏
+add_definitions(-DDEBUG)
+add_executable(app ./test.c)
+```
+## CMake 常用宏
+|宏|功能|
+|---|---|
+|PROJECT_SOURCE_DIR| 	使用cmake命令后紧跟的目录，一般是工程的根目录|
+|PROJECT_BINARY_DIR| 	执行cmake命令的目录|
+|CMAKE_CURRENT_SOURCE_DIR |	当前处理的CMakeLists.txt所在的路径|
+|CMAKE_CURRENT_BINARY_DIR |	target 编译目录|
+|EXECUTABLE_OUTPUT_PATH |	重新定义目标二进制可执行文件的存放位置|
+|LIBRARY_OUTPUT_PATH |	重新定义目标链接库文件的存放位置|
+|PROJECT_NAME |	返回通过PROJECT指令定义的项目名称|
+|CMAKE_BINARY_DIR 	|项目实际构建路径，假设在build目录进行的构建，那么得到的就是这个目录的路径|
+
