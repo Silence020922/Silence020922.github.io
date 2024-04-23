@@ -95,7 +95,7 @@ file(GLOB MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 :::tip
 CMAKE_CURRENT_SOURCE_DIR 宏表示当前访问的 CMakeLists.txt 文件所在的路径。关于要搜索的文件路径和类型可加双引号，也可不加:
 :::
-
+<!-- 
 ## include_directories——包含头文件
 举例说明，有源文件若干，其目录结构如下：
 ```zsh
@@ -521,4 +521,4 @@ add_executable(app ./test.c)
 |LIBRARY_OUTPUT_PATH |	重新定义目标链接库文件的存放位置|
 |PROJECT_NAME |	返回通过PROJECT指令定义的项目名称|
 |CMAKE_BINARY_DIR 	|项目实际构建路径，假设在build目录进行的构建，那么得到的就是这个目录的路径|
-
+ -->
