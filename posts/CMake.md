@@ -376,7 +376,6 @@ list(REMOVE_ITEM SRC_1 ${PROJECT_SOURCE_DIR}/main.cpp)
 # 移除后日志
 message(STATUS "message: ${SRC_1}")
 ```
-<!--
 ### list 其他命令
 [官方文档](https://cmake.org/cmake/help/latest/command/list.html#list)
 - 获取 list 的长度
@@ -394,8 +393,8 @@ message(STATUS "message: ${SRC_1}")
     - <element index>：列表元素的索引
 
         从0开始编号，索引0的元素为列表中的第一个元素；
-    索引也可以是负数，-1表示列表的最后一个元素，-2表示列表倒数第二个元素，以此类推
-    当索引（不管是正还是负）超过列表的长度，运行会报错
+        索引也可以是负数，-1表示列表的最后一个元素，-2表示列表倒数第二个元素，以此类推
+        当索引（不管是正还是负）超过列表的长度，运行会报错
 
     - <output variable>：新创建的变量，存储指定索引元素的返回结果，也是一个列表。
 - 将列表中的元素用连接符（字符串）连接起来组成一个字符串
@@ -470,6 +469,7 @@ message(STATUS "message: ${SRC_1}")
 
         - ASCENDING:按照升序排列，为默认值
         - DESCENDING：按照降序排列
+<!--
 ## 自定义宏
 在书写C++代码时会设置宏标明测试模式，通过这些宏来控制这些代码是否生效，例如
 ```c++
