@@ -92,7 +92,7 @@ file(GLOB/GLOB_RECURSE 变量名 要搜索的文件路径和文件类型)
 ```cmake
 file(GLOB MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 ```
-:::tips
+:::tip
 CMAKE_CURRENT_SOURCE_DIR 宏表示当前访问的 CMakeLists.txt 文件所在的路径。关于要搜索的文件路径和类型可加双引号，也可不加:
 :::
 
@@ -164,7 +164,7 @@ cd build
 cmake ..
 make
 ```
-:::tips
+:::tip
 生成`libcalc.a`文件为二进制文件，本质上与`src`中文件并无不同，只是不具备可读性，仍然需要`include`中的头文件。
 :::
 
@@ -414,8 +414,8 @@ message(STATUS "message: ${SRC_1}")
     - <value>：需要再列表中搜索的元素
     - <output variable>：新创建的变量
 
-        如果列表<list>中存在<value>，那么返回<value>在列表中的索引
-        如果未找到则返回-1
+        - 如果列表<list>中存在<value>，那么返回<value>在列表中的索引
+        - 如果未找到则返回-1
 - 将元素追加到列表中
     ```cmake
     list (APPEND <list> [<element> ...])
