@@ -300,7 +300,6 @@ add_executable(app ${SRC_LIST})
 # 指定要链接的动态库
 target_link_libraries(app pthread calc)
 ```
-<!--
 ## 日志
 在CMake中可以用用户显示一条消息，该命令的名字为message
 ```cmake
@@ -324,6 +323,7 @@ message(WARNING "source path: ${PROJECT_SOURCE_DIR}")
 # 输出错误信息
 message(FATAL_ERROR "source path: ${PROJECT_SOURCE_DIR}")
 ```
+<!--
 ## 变量操作
 ### 拼接
 #### set
