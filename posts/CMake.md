@@ -323,7 +323,6 @@ message(WARNING "source path: ${PROJECT_SOURCE_DIR}")
 # 输出错误信息
 message(FATAL_ERROR "source path: ${PROJECT_SOURCE_DIR}")
 ```
-<!--
 ## 变量操作
 ### 拼接
 #### set
@@ -361,7 +360,7 @@ $ tree
 0 directories, 5 files
 
 ```
-在当前这么目录有五个源文件，其中main.cpp是一个测试文件。如果我们想要把计算器相关的源文件生成一个动态库给别人使用，那么只需要add.cpp、div.cp、mult.cpp、sub.cpp这四个源文件就可以了。此时，就需要将main.cpp从搜索到的数据中剔除出去，想要实现这个功能，也可以使用list
+在当前这么目录有五个源文件，其中`main.cpp`是一个测试文件。如果我们想要把计算器相关的源文件生成一个动态库给别人使用，那么只需要`add.cpp`、`div.cpp`、`mult.cpp`、`sub.cpp`这四个源文件就可以了。此时，就需要将main.cpp从搜索到的数据中剔除出去，想要实现这个功能，也可以使用list
 ```cmake
 list(REMOVE_ITEM <list> <value> [<value> ...])
 ```
@@ -377,6 +376,7 @@ list(REMOVE_ITEM SRC_1 ${PROJECT_SOURCE_DIR}/main.cpp)
 # 移除后日志
 message(STATUS "message: ${SRC_1}")
 ```
+<!--
 ### list 其他命令
 [官方文档](https://cmake.org/cmake/help/latest/command/list.html#list)
 - 获取 list 的长度
