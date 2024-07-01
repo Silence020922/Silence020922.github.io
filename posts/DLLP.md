@@ -39,5 +39,7 @@ $Theorem\;2$证明Bound $B_2$部分 P1067
 :::
 对于加和式中的第一项，这里我的理解为
 $$
-\begin{aligned}&2LT^{2}\sum_{i\in S_{k}}\mathbb{E}\|\frac{1}{TN_{k}^{i}}\sum_{n\in\mathcal{N}_{k}^{i}}\sum_{i=1}^{T}\gamma[\nabla F_{n}^{i}(x_{k,n,t-1},\xi_{n,t-1})\\&-\nabla F_{n}^{i}(x_{k,n,t-1})]\|^{2}\end{aligned}
+\begin{aligned}&2LT^{2}\sum_{i\in S_{k}}\mathbb{E}\|\frac{1}{TN_{k}^{i}}\sum_{n\in\mathcal{N}_{k}^{i}}\sum_{i=1}^{T}\gamma[\nabla F_{n}^{i}(x_{k,n,t-1},\xi_{n,t-1})\\&-\nabla F_{n}^{i}(x_{k,n,t-1})]\|^{2}\end{aligned}\\
+\leq \begin{aligned}&\frac{2LT^2\gamma^2}{T\Gamma^*}\sum_{n=1}^N\sum_{t=1}^T\sum_{i\in S_k}\mathbb{E}\|[\nabla F_n^i(x_{k,n,t-1},\xi_{n,t-1})\\&-\nabla F_n^i(x_{k,n,t-1})]\|^2\end{aligned}
 $$
+这里使用不等式放缩的系数$TN^{i}_{k}$没乘进去。
