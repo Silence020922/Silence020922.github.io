@@ -2,7 +2,7 @@
 date: 2024-06-16
 title: D-PSGD算法与实践
 tags:
-- D-PSGD
+- FL
 description: 加速transormer模型训练速度，以便应用到较长上下文中。
 ---
 ## 算法
